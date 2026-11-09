@@ -1,0 +1,10 @@
+import { useState } from 'react';
+import { ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
+import { addDays, occupiedCount } from './metrics.mjs';
+export function Occupancy({ rooms, reservations, today }) {
+  const [offset, setOffset] = useState(0);
+  const days = Array.from({length: 7}, (_, i) => addDays(today, offset + i));
+  const counts = days.map(day => occupiedCount(rooms, reservations, day));
+  const rate = rooms.length ? Math.round(counts.reduce((a,b) => a+b,0) / (rooms.length * 7) * 100) : null;
+  return <section className="panel occupancy-panel"><div className="panel-heading"><div><span className="eyebrow">UM OLHAR PARA A SEMANA</span><h2>Ocupação prevista</h2><p>{days[0].split('-').reverse().join('/')} a {days[6].split('-').reverse().join('/')}</p></div><div className="week-controls"><button className="icon-button" aria-label="Semana anterior" onClick={() => setOffset(o => o-7)}><ChevronLeft size={18}/></button><button className="filter" onClick={() => setOffset(0)}>Hoje</button><button className="icon-button" aria-label="Próxima semana" onClick={() => setOffset(o => o+7)}><ChevronRight size={18}/></button></div></div><div className="occupancy-body"><div className="occupancy-summary"><strong>{rate === null ? '—' : rate + '%'}</strong><p>das noites previstas<br/>no período</p><small title="Soma de quartos reservados por dia ÷ (quartos atualmente cadastrados × 7 noites). Saída não ocupa a noite.">Base: {rooms.length} quarto(s) cadastrados · 7 noites</small></div><div className="bars" role="list" aria-label="Quartos com reserva por dia">{days.map((day,i) => <div className="bar-column" role="listitem" key={day} aria-label={`${day}: ${counts[i]} de ${rooms.length} quartos`}><span>{counts[i]}</span><div className="bar-track"><div className="bar-fill" style={{height: `${rooms.length ? counts[i]/rooms.length*100 : 0}%`}}/></div><small>{day.slice(8)}/{day.slice(5,7)}</small></div>)}</div></div>{!rooms.length && <p className="form-hint">Cadastre os quartos para acompanhar a ocupação. Nenhum dado estimado é exibido.</p>}</section>;
+}
