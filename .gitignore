@@ -1,0 +1,18 @@
+
+# Dependências do Node.js
+node_modules/
+
+# Arquivos temporários e logs
+*.log
+npm-debug.log*
+
+# Configurações locais
+.env
+.env.*
+
+# Banco de dados local
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+dist/
